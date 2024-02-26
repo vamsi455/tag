@@ -1,0 +1,33 @@
+pipeline {
+    agent any
+    environment {
+        SCANNER_HOME = tool 'sonar-scanner' // Removed 'tool' keyword and corrected the assignment syntax
+    }
+    stages {
+        stage('Gitclone') {
+            steps {
+              checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'git-cred', url: 'https://github.com/prudhvisurya996/jpetstore-6.git']])
+            }
+        }
+        stage('test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage("Sonarqube Analysis") { // Corrected stage name
+            steps {
+                script {
+                    withSonarQubeEnv('sonar-server') {
+                             sh '''${SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectKey=petshop \
+                   -Dsonar.projectName=petshop \
+                   -Dsonar.projectVersion=1.0 \
+                   -Dsonar.java.binaries=target/classes\
+                   -Dsonar.sources=src '''
+                    }
+                }
+            }
+        }
+        stage("Quality Gate") { // Corrected stage name
+            steps {
+                script {
+                    timeout(time: 1, unit: 'MINUTE') { // Added a timeout for quality gate check
