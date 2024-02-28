@@ -1,0 +1,45 @@
+pipeline {
+    agent any
+    tools {
+        jdk 'jdk17'
+        maven 'maven3'
+    }
+    stages{
+        stage('clean workspace'){
+            steps{
+                cleanWs()
+            }
+        }
+        stage('checkout'){
+            steps{
+                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/vamsi455/jpetstore-6.git']])
+            }
+        }
+        stage('mvn package'){
+            steps{
+                sh 'mvn package'
+            }
+        }
+        stage('docker build'){
+            steps{
+                script{
+                    withDockerRegistry(credentialsId: 'docker-cred1', toolName: 'docker ') {
+                       sh 'docker build -t petshop6 .'
+                       sh 'docker tag petshop6 vamsi045/petshop6:v1.0.0'
+                       sh 'docker push vamsi045/petshop6:v1.0.0' 
+                    }
+                }
+            }
+        }
+        stage('trivy'){
+            steps{
+                sh "trivy image vamsi045/petshop6:v1.0.0 >trivy.txt"
+            }
+        }
+        stage('deploy to container'){
+            steps{
+                sh "docker run --name vamsi -d -p 8084:8080 vamsi045/petshop6:v1.0.0"
+            }
+        }
+    }    
+}    
