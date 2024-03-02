@@ -1,0 +1,11 @@
+# Define image name
+IMAGE_NAME=my_image
+
+# Build Docker image
+docker build -t $IMAGE_NAME:latest .
+
+# Tag Docker image
+docker tag $IMAGE_NAME:latest my_registry/$IMAGE_NAME:latest
+
+# Push Docker image
+docker push my_registry/$IMAGE_NAME:latest
