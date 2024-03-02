@@ -1,0 +1,8 @@
+IMAGE_NAME=my_image
+TAG=latest
+
+# Build Docker image
+docker build -t $IMAGE_NAME:$TAG .
+
+# Tag Docker image
+docker tag $IMAGE_NAME:$TAG my_registry/$IMAGE_NAME:$TAG
