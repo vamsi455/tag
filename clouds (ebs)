@@ -1,0 +1,10 @@
+df -h 
+lsblk (list all block divuces in linux machine)
+check is there any file system on this device
+create a file system  
+file -t xfs /dev/xvdf
+check is there any file system on this device 
+file -s /dev/xvdf
+create a directory mkdir -p app/volume
+mount /dev/xvdf apps/volume
+df -h
